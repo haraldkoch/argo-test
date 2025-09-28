@@ -3,7 +3,7 @@ apiVersion: argoproj.io/v1alpha1
 kind: ApplicationSet
 metadata:
   name: argo-test
-  namespace: argo
+  namespace: default
 spec:
   syncPolicy:
     preserveResourcesOnDeletion: false
@@ -18,20 +18,15 @@ spec:
     metadata:
       name: '{{.path.basename}}'
     spec:
-      project: homelab
+      project: argo-test
       source:
         repoURL: https://github.com/haraldkoch/argo-test.git
         path: '{{ .path.path }}'
         targetRevision: HEAD
-        directory:
-          recurse: false
-          include: "{kustomization.yaml}"
       destination:
         server: "https://kubernetes.default.svc"
-        namespace: '{{.path.basename}}'
+        namespace: '{{index .path.segments 1}}'
       syncPolicy:
-        syncOptions:
-          - CreateNamespace=true
         automated:
           prune: true
           selfHeal: true
